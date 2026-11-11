@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /BASE/
+
+    # Dejar que Apache sirva archivos y directorios existentes, como CSS e imágenes.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # API: /BASE/api/productos -> api_router.php?resource=productos
+    RewriteRule ^api/(.+)$ api_router.php?resource=$1 [QSA,L]
+
+    # Sitio: /BASE/producto/12 -> api_router.php?action=producto/12
+    RewriteRule ^$ api_router.php?action=home [QSA,L]
+    RewriteRule ^(.+)$ api_router.php?action=$1 [QSA,L]
+</IfModule>
