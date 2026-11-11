@@ -55,14 +55,13 @@ class Route extends Routable {
         foreach ($partsRoute as $key => $part) {
             // si es un parametro, lo guardo en params
             if (str_starts_with($part, ':')) {
-
-            $param = substr($part, 1);
-            $this->params[$param] = $partsURL[$key];
+                $param = substr($part, 1);
+                $this->params[$param] = $partsURL[$key];
             } else {
-
                 if ($part !== $partsURL[$key]) {
                     return false;
                 }
+            }
         }
         return true;
     }
