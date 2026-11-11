@@ -48,7 +48,7 @@ $apiRouter->addRoute('reseñas/:id', 'DELETE', 'ReviewApiController', 'deleteRev
 
 
 // --- A partir de acá, requiere autenticación ---
-$apiRouter->addMiddleware(new GuardMiddleware());
+$apiRouter->addMiddleware(new ApiGuardMiddleware());
 
 $apiRouter->addRoute('productos', 'POST', 'ProductApiController', 'insertProduct');
 $apiRouter->addRoute('productos/:id', 'PUT', 'ProductApiController', 'updateProduct');
@@ -76,7 +76,7 @@ $webRouter->addRoute('do_login','POST','AuthController','doLogin');
 // RUTAS PRIVADAS
 // ------------------------
 
-$webRouter->addMiddleware(new GuardMiddleware());
+$webRouter->addMiddleware(new WebGuardMiddleware());
 
 $webRouter->addRoute('productos','GET','ProductController','showProducts');
 $webRouter->addRoute('agregar-producto','GET','ProductController','showAddProductForm');
