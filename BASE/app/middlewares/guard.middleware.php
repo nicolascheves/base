@@ -1,5 +1,5 @@
 <?php
-class GuardMiddleware {
+class WebGuardMiddleware {
     public function run($request) {
         if($request->user) {
             return $request;
