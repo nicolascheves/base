@@ -3,122 +3,120 @@
 require_once __DIR__ . '/request.php';
 require_once __DIR__ . '/response.php';
 
-// Parent class for Route and Middleware
-abstract class Routable {
-    abstract public function run($request, $response);
-    abstract public function match($url, $verb);
-    abstract public function isRoute();
+abstract class Middleware
+{
+    /** Return false to stop dispatching after producing a response or redirect. */
+    abstract public function run($request, $response): bool;
 }
 
-abstract class Middleware extends Routable {
-    public function match($url, $verb) {
-        // Middleware always matches
-        return true;
-    }
-    public function isRoute() {
-        return false;
-    }
+final class Route
+{
+    private string $url;
+    private string $verb;
+    private string $controller;
+    private string $method;
+    private array $middlewares;
+    private array $params = [];
 
-    abstract public function run($request, $response);
-}
-
-class Route extends Routable {
-    private $url;
-    private $verb;
-    private $controller;
-    private $method;
-    private $params;
-
-    public function __construct($url, $verb, $controller, $method){
-        $this->url = $url;
-        $this->verb = $verb;
+    public function __construct(string $url, string $verb, string $controller, string $method, array $middlewares = [])
+    {
+        $this->url = trim($url, '/');
+        $this->verb = strtoupper($verb);
         $this->controller = $controller;
         $this->method = $method;
-        $this->params = [];
+        $this->middlewares = $middlewares;
+
+        foreach ($middlewares as $middleware) {
+            if (!$middleware instanceof Middleware) {
+                throw new InvalidArgumentException('Route middleware must extend Middleware.');
+            }
+        }
     }
 
-    // no lo entiendo mucho 
-    public function match($url, $verb) {
-
-        $this->params = [];
-        if($this->verb != $verb){
-            return false;
-        }
-        $partsURL = explode("/", trim($url,'/'));
-        $partsRoute = explode("/", trim($this->url,'/'));
-
-        if(count($partsRoute) != count($partsURL)){
+    public function match(string $url, string $verb): bool
+    {
+        if ($this->verb !== strtoupper($verb)) {
             return false;
         }
 
-        //Si la ruta está vacía )??
-        foreach ($partsRoute as $key => $part) {
-            // si es un parametro, lo guardo en params
+        $routeParts = $this->url === '' ? [] : explode('/', $this->url);
+        $url = trim($url, '/');
+        $urlParts = $url === '' ? [] : explode('/', $url);
+
+        if (count($routeParts) !== count($urlParts)) {
+            return false;
+        }
+
+        $params = [];
+        foreach ($routeParts as $index => $part) {
+            $value = rawurldecode($urlParts[$index]);
             if (str_starts_with($part, ':')) {
-
-            $param = substr($part, 1);
-            $this->params[$param] = $partsURL[$key];
-            } else {
-
-                if ($part !== $partsURL[$key]) {
+                if ($value === '') {
                     return false;
                 }
+                $params[substr($part, 1)] = $value;
+            } elseif ($part !== $value) {
+                return false;
+            }
         }
+
+        $this->params = $params;
         return true;
     }
-    public function run($request, $response){
-        $controller = $this->controller;  
-        $method = $this->method;
+
+    public function dispatch($request, $response, array $globalMiddlewares): bool
+    {
         $request->params = (object) $this->params;
-       
+
+        foreach (array_merge($globalMiddlewares, $this->middlewares) as $middleware) {
+            if ($middleware->run($request, $response) === false) {
+                return false;
+            }
+            if ($response->hasFinished()) {
+                return false;
+            }
+        }
+
+        $controller = $this->controller;
+        $method = $this->method;
         (new $controller())->$method($request, $response);
-    }
-    public function isRoute() {
         return true;
     }
 }
 
-class Router {
-    private $routeTable = [];
-    private $defaultRoute;
-    private $request;
-    private $response;
+final class Router
+{
+    private array $routes = [];
+    private array $middlewares = [];
+    private Request $request;
+    private Response $response;
 
-    public function __construct() {
-        $this->defaultRoute = null;
+    public function __construct()
+    {
         $this->request = new Request();
         $this->response = new Response();
     }
 
-    public function route($url, $verb) {
-        foreach ($this->routeTable as $route) {
+    public function addMiddleware(Middleware $middleware): void
+    {
+        $this->middlewares[] = $middleware;
+    }
 
-            // aca es $route o $routeble
+    public function addRoute(string $url, string $verb, string $controller, string $method, array $middlewares = []): void
+    {
+        $this->routes[] = new Route($url, $verb, $controller, $method, $middlewares);
+    }
+
+    public function route(string $url, string $verb): void
+    {
+        foreach ($this->routes as $route) {
             if ($route->match($url, $verb)) {
-                $route->run($this->request, $this->response);
-
-                if($this->response->hasFinished()) return;
-
-                // Si es una ruta coincidente, finalizamos.
-                // abstraemos e implementamos isroute()
-                if ($route->isRoute()) return;
-                
+                $route->dispatch($this->request, $this->response, $this->middlewares);
+                return;
             }
         }
-        //Si ninguna ruta coincide con el pedido y se configuró ruta por defecto.
-        if ($this->defaultRoute != null)
-            $this->defaultRoute->run($this->request, $this->response);
-    }
 
-    public function addMiddleware($middleware) {
-        $this->routeTable[] = $middleware;
-    }
-    
-    public function addRoute ($url, $verb, $controller, $method) {
-        $this->routeTable[] = new Route($url, $verb, $controller, $method);
-    }
-
-    public function setDefaultRoute($controller, $method) {
-        $this->defaultRoute = new Route("", "", $controller, $method);
+        http_response_code(404);
+        echo 'Ruta no encontrada';
     }
 }
