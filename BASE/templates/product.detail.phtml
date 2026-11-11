@@ -1,0 +1,37 @@
+<?php require_once 'layout/header.phtml'; ?>
+
+<div class="product-detail-container">
+    
+    <a href="<?= BASE_URL ?>" class="btn-back">← Volver al Listado</a>
+    
+    <h1><?= $product->name ?></h1>
+    
+    <div class="product-content">
+        
+        <div class="product-media">
+            <img src="<?= $product->img ?>" alt="Imagen de <?= $product->name ?>" class="detail-image">
+            <p class="model-info">Modelo: <strong><?= $product->model ?></strong></p>
+        </div>
+        
+        <div class="product-info-box">
+            
+            <h2>Precio: $<?= number_format($product->price, 2, ',', '.') ?></h2>
+            
+            <p class="detail-description">
+                <strong>Descripción Completa:</strong>
+                <?= $product->description ?>
+            </p>
+            
+            <?php if (isset($product->category_name)) { ?>
+                <p class="detail-category">
+                    Categoría: <strong><?= $product->category_name ?></strong>
+                </p>
+            <?php } ?>
+            
+            
+
+    </div>
+    
+</div>
+
+<?php require_once 'layout/footer.phtml'; ?>

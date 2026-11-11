@@ -1,0 +1,53 @@
+<?php require_once 'layout/header.phtml'; ?>
+
+<div class="products-grid-container content-wrapper">
+    
+    <?php if (empty($products)) { ?>
+        <div class="empty-state">
+            <p>No se encontraron productos para mostrar.</p>
+        </div>
+    <?php } else { ?>
+    
+        <?php foreach ($products as $product) { ?>
+            
+            <div class="product-card">
+                
+                <a href="<?= BASE_URL ?>producto/<?= $product->id ?>" class="card-link">
+                    
+                    <div class="card-image-container">
+                        <img src="<?= $product->img ?>" alt="Imagen de <?= $product->name ?>" class="product-card__image"> 
+                    </div>
+
+                    <div class="card-content">
+                        
+                        <h3 class="product-card__name"><?= $product->name ?></h3>
+                        
+                        <p class="card-model">Modelo: <strong><?= $product->model ?></strong></p>
+                        
+                        <p class="product-card__price">$<?= number_format($product->price, 2, ',', '.') ?></p>
+                        
+                        <p class="card-description"><?= substr($product->description, 0, 80) ?>...</p>
+
+                        <p class="card-category">Categoría ID: **<?= $product->id_category ?>**</p>
+                    </div>
+                </a>
+
+            <?php if(isset($user)): ?>
+                <div class="actions">
+                    <?php if (!$product->finalizada) { ?>
+                        <a href="finalizar/<?= $product->id ?>" class='btn btn-sm btn-success ml-auto'>FINALIZAR</a>
+                    <?php } ?>
+
+                    <a class="btn btn-sm btn-danger" href="eliminar/<?= $product->id ?>">ELIMINAR</a>
+                </div>
+            <?php endif; ?>
+
+
+            </div>
+        <?php } ?>
+
+    <?php } ?>
+
+</div>
+
+<?php require_once 'layout/footer.phtml'; ?>
