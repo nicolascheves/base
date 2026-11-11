@@ -1,6 +1,6 @@
 <?php
 
-    class GuardMiddleware extends Middleware {
+    class ApiGuardMiddleware extends Middleware {
         public function run($request, $response) {
             if(!$request->user) {
                 header("WWW-Authenticate: Bearer realm='Access to the API'");
