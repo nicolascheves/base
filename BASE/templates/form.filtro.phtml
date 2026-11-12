@@ -1,0 +1,23 @@
+<form id="form-filtro" action="" method="GET">
+    <select id="select-categoria" name="category_id">
+        <option value="">Todas las Categorías</option>
+        <?php foreach ($categories as $category) { ?>
+            <option value="<?= $category->id ?>"><?= $category->name ?></option>
+        <?php } ?>
+    </select>
+    <button type="submit">Aplicar </button>
+</form>
+
+<?php
+
+if (isset($_GET['category_id']) && $_GET['category_id'] !== '') {
+    $categoriaId = $_GET['category_id'];
+    header("Location: " . BASE_URL . "categoria/" . $categoriaId);
+    exit;
+} elseif (isset($_GET['category_id'])) {
+   
+    header("Location: " . BASE_URL . "home");
+    exit;
+}
+?>
+

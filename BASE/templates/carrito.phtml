@@ -1,0 +1,75 @@
+<?php require_once 'layout/header.phtml'; ?>
+
+<div class="carrito-container">
+
+    <?php if (!empty($carrito->getItems())) { ?>
+        <?php foreach ($carrito->getItems() as $item_carrito) { ?>
+
+            <?php
+                $product = $item_carrito->getProducto();
+                $cantidad = $item_carrito->getCantidad();
+            ?>
+
+            <article class="product-carrito">
+
+                <img src="<?= $product->img ?>"alt="<?= htmlspecialchars($product->name) ?>">
+
+                <div>
+                    <h3><?= htmlspecialchars($product->name) ?></h3>
+
+                    <p>Precio: $<?= number_format($product->price, 2, ',', '.') ?></p>
+
+                    <p>Cantidad: <?= $cantidad ?></p>
+
+                    <p>Subtotal:
+                        $<?= number_format($item_carrito->getSubtotal(), 2, ',', '.') ?>
+                    </p>
+                </div>
+
+                <?php if (isset($_SESSION['USER_ID'])) { ?>
+
+                    <div class="product-carrito__actions">
+
+                        <a href="<?= BASE_URL ?>carrito/disminuir/<?= $product->id ?>">
+                            -
+                        </a>
+
+                        <span><?= $item_carrito->getCantidad() ?></span>
+                        //<span><?= $cantidad ?></span>
+
+                        <a href="<?= BASE_URL ?>carrito/aumentar/<?= $product->id ?>">
+                            +
+                        </a>
+
+                        <a href="<?= BASE_URL ?>carrito/eliminar/<?= $product->id ?>">
+                            Eliminar
+                        </a>
+
+                    </div>
+
+                <?php } ?>
+
+            </article>
+
+        <?php } ?>
+
+        <div class="carrito-total">
+            <h2>
+                TOTAL: $
+                <?= number_format($carrito->calcularTotal(), 2, ',', '.') ?>
+            </h2>
+        </div>
+
+        <a href="<?= BASE_URL ?>checkout">
+            Proceder al checkout
+        </a>
+
+    <?php } else { ?>
+
+        <p>No hay productos en el carrito.</p>
+
+    <?php } ?>
+
+</div>
+
+<?php require_once 'layout/footer.phtml'; ?>

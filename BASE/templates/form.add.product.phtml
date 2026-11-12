@@ -1,0 +1,46 @@
+<?php require_once 'layout/header.phtml'; ?>
+
+<div class="">
+    <form action="<?= BASE_URL ?>agregar-producto" method="POST" class="form-producto">
+        <h2>Agregar Nuevo Producto</h2>
+
+        <div class="form-group">
+            <label for="name">Nombre:</label>
+            <input type="text" name="name" id="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="img">URL de Imagen:</label>
+            <input type="url" name="img" id="img" required>
+        </div>
+
+        <div class="form-group">
+            <label for="model">Modelo:</label>
+            <input type="text" name="model" id="model" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Precio:</label>
+            <input type="number" name="price" id="price" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descripción:</label>
+            <textarea name="description" id="description" required></textarea>
+        </div>
+
+        <div class="form-group">
+    <label for="id_category">Categoría:</label>
+    <select name="id_category" id="id_category" required>
+        <option value="">-- Seleccione una categoría --</option>
+        <?php foreach ($categories as $category) { ?>
+            <option value="<?= $category->id ?>"> 
+                <?= $category->name ?>
+            </option>
+        <?php } ?>
+    </select>
+</div>
+
+        <button type="submit">Agregar Producto</button>
+    </form>
+</div>
