@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +7,19 @@
     <title>Tienda digital de Apple</title>
 </head>
 <body>
-  <header class="main-header">
-    <h1>Tienda Apple</h1>
-    <nav class="nav-bar">
+<header class="main-header">
+    <h1><a href="<?= BASE_URL ?>home">Tienda Apple</a></h1>
+    <nav class="nav-bar" aria-label="Navegación principal">
         <ul class="nav-list">
             <li><a href="<?= BASE_URL ?>home">Home</a></li>
+            <li><a href="<?= BASE_URL ?>carrito">Carrito</a></li>
             <?php if (isset($_SESSION['USER_ID'])) { ?>
-            <li><a href="<?= BASE_URL ?>categorias">Administrar categorias</a></li>
-            <li><a href="<?= BASE_URL ?>productos">Administrar productos</a></li>
-            
-            <li><a href="<?= BASE_URL ?>logout">Cerrar Sesión</a></li> 
-        <?php } else { ?>
-            
-            <li><a href="<?= BASE_URL ?>login">Iniciar Sesión</a></li>
-        <?php } ?>
+                <li><a href="<?= BASE_URL ?>categorias">Administrar categorías</a></li>
+                <li><a href="<?= BASE_URL ?>productos">Administrar productos</a></li>
+                <li><a href="<?= BASE_URL ?>logout">Cerrar sesión</a></li>
+            <?php } else { ?>
+                <li><a href="<?= BASE_URL ?>login">Iniciar sesión</a></li>
+            <?php } ?>
         </ul>
     </nav>
 </header>

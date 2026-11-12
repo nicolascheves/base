@@ -13,6 +13,7 @@ require_once './app/controllers/web/home.controller.php';
 require_once './app/controllers/web/product.controller.php';
 require_once './app/controllers/web/category.controller.php';
 require_once './app/controllers/web/auth.controller.php';
+require_once './app/controllers/carrito/carrito.controller.php';
 
 require_once './app/middlewares/session.middleware.php';
 require_once './app/middlewares/guard.middleware.php';
@@ -49,7 +50,6 @@ $apiRouter->addRoute('categorias', 'POST', 'CategoryApiController', 'insertCateg
 $apiRouter->addRoute('categorias/:id', 'PUT', 'CategoryApiController', 'updateCategory');
 $apiRouter->addRoute('categorias/:id', 'DELETE', 'CategoryApiController', 'deleteCategory');
 
-
 // ---- WEB ----
 $webRouter->addMiddleware(new SessionMiddleware());
 
@@ -59,6 +59,12 @@ $webRouter->addRoute('categoria/:id', 'GET', 'ProductController', 'showProductsB
 
 $webRouter->addRoute('login', 'GET', 'AuthController', 'showLogin');
 $webRouter->addRoute('do_login', 'POST', 'AuthController', 'doLogin');
+
+// Carrito de sesión: disponible también para visitantes sin iniciar sesión.
+$webRouter->addRoute('carrito', 'GET', 'CarritoController', 'mostrar');
+$webRouter->addRoute('carrito/agregar/:id', 'POST', 'CarritoController', 'agregar');
+$webRouter->addRoute('carrito/cantidad/:id', 'POST', 'CarritoController', 'modificarCantidad');
+$webRouter->addRoute('carrito/eliminar/:id', 'POST', 'CarritoController', 'eliminar');
 
 $webRouter->addMiddleware(new WebGuardMiddleware());
 

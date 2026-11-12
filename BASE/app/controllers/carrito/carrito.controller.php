@@ -1,50 +1,50 @@
 <?php
+require_once './app/models/carrito/carrito.model.php';
+require_once './app/views/carrito.view.php';
 
-// hay 
-class CarritoController {
-    private $items = [];
+class CarritoController
+{
+    private $model;
+    private $view;
 
-    public function agregarProducto($producto) {
-        $id = $producto->id;
-
-        if (isset($this->items[$id])) {
-            $this->items[$id]->setCantidad($this->items[$id]->getCantidad() + 1);
-        } else {
-            $this->items[$id] = new ItemCarrito($producto);
-        }
+    public function __construct()
+    {
+        $this->model = new CarritoModel();
+        $this->view = new CarritoView();
     }
 
-    public function quitarProducto($id) {
-        if (isset($this->items[$id])) {
-            $this->items[$id]->setCantidad(
-                $this->items[$id]->getCantidad() - 1
-            );
-
-            if ($this->items[$id]->getCantidad() <= 0) {
-                unset($this->items[$id]);
-            }
-        }
+    public function mostrar($request, $response)
+    {
+        $this->view->mostrar($this->model->getItems(), $this->model->calcularTotal());
     }
 
-    public function eliminarProducto($id) {
-        unset($this->items[$id]);
+    public function agregar($request, $response)
+    {
+        $this->model->agregarProducto($request->params->id ?? 0);
+        $this->redirectToCart();
     }
 
-    public function getItems() {
-        return $this->items;
-    }
+    public function modificarCantidad($request, $response)
+    {
+        $id = (int)($request->params->id ?? 0);
+        $delta = (int)($_POST['delta'] ?? 0);
 
-    public function calcularTotal() {
-        $total = 0;
-
-        foreach ($this->items as $item) {
-            $total += $item->getSubtotal();
+        if ($delta !== 0) {
+            $this->model->modificarCantidad($id, $delta);
         }
 
-        return $total;
+        $this->redirectToCart();
     }
 
-    public function vaciar() {
-        $this->items = [];
+    public function eliminar($request, $response)
+    {
+        $this->model->eliminarProducto($request->params->id ?? 0);
+        $this->redirectToCart();
+    }
+
+    private function redirectToCart()
+    {
+        header('Location: ' . BASE_URL . 'carrito');
+        exit;
     }
 }
